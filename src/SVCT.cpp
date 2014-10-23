@@ -17,6 +17,7 @@
 #include <float.h>
 #include <fcntl.h>
 #include <omp.h>
+#include <random>
 
 using namespace std;
 
@@ -36,6 +37,32 @@ struct SCORE{
 	
 };
 
+class RNG_st12918758
+{
+public:
+    typedef mt19937 Engine;
+    typedef normal_distribution<double> Distribution;
+
+    RNG_st12918758(int seeding) : engines(), distribution(0.0, 1.0)
+    {
+        int threads = max(1, omp_get_max_threads());
+        for(int seed = 0; seed < threads; ++seed)
+        {
+            engines.push_back(Engine(seeding+seed));//time(NULL)
+        }
+    }
+
+    double operator()()
+    {
+        int id = omp_get_thread_num();
+        return distribution(engines[id]);
+    }
+
+    vector<Engine> engines;
+    Distribution distribution;
+};
+
+/** NOT portable
 void rnorm(drand48_data &buf, int n, vector<double> &v1, vector<double> &v2){
 	
 	v1 = vector<double> (n, .0);
@@ -58,6 +85,7 @@ void rnorm(drand48_data &buf, int n, vector<double> &v1, vector<double> &v2){
 	}
 	
 }
+*/
 
 SCORE score0(.0, -1);
 
@@ -77,11 +105,15 @@ double *pval, int *obs_rank){
 	int nkappa = *input_nkappa;
 	int seed = *input_seed;
 	int nthread = *input_nthread;
-	
+#ifdef _WIN32
+//WIN works on Rtools GCC-4.6.3
+	nthread=8;
+#else
+//Linux/Mac
 	if(nthread <= 0 || nthread > sysconf( _SC_NPROCESSORS_ONLN )){
 		nthread = sysconf( _SC_NPROCESSORS_ONLN );
 	}
-	
+#endif	
 	vector<double> obs_score_D(np, .0);
 	vector<double> obs_score_Z(np, .0);
 	vector<vector<double> > inv_VD(np, vector<double> (np, .0));
@@ -118,25 +150,29 @@ double *pval, int *obs_rank){
 		x3[0] += obs_score_D[i] * obs_score_Z[i];
 	}
 	
-	drand48_data buf;
+	//drand48_data buf;
 	
 	//cout << "nthread = " << nthread << endl;
 	Rprintf("nthread = %d\n", nthread);
 	R_FlushConsole();
 	R_ProcessEvents();
+
 	
-	#pragma omp parallel num_threads(nthread) private(buf)
+  seed= seed >=0 ? seed : time(NULL);//seeding
+
+  RNG_st12918758 st_rnd(seed);
+
+	#pragma omp parallel num_threads(nthread)
 	{
-		if(seed < 0){
-			srand48_r(time(NULL), &buf);
-		}else{
-			srand48_r(seed, &buf);
-		}
 		
 		#pragma omp for
 		for(int k = 0; k < nperm; ++k){
-			vector<double> v1, v2;
-			rnorm(buf, np, v1, v2);
+			vector<double> v1(np,.0), v2(np,.0);
+
+			for (int i=0;i<np;++i){
+        v1[i]=st_rnd();
+        v2[i]=st_rnd();
+      }
 			
 			vector<double> u1(np, .0);
 			vector<double> u2(np, .0);
