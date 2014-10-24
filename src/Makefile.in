@@ -1,0 +1,11 @@
+# set by configure
+# I use GCC-4.9.1
+#CPPFLAGS = @SVCT_CPPFLAGS@ @SVCT_CFLAGS@ -fopenmp
+
+CPPFLAGS = -Wall -g -std=gnu++11 -O4 -fopenmp
+CPPLIBS = @SVCT_LIBS@ @SVCT_R_INC@/lib/libR.so -lm
+CXX = @SVCT_CPP@
+R_INC= -I@SVCT_R_INC@/include
+
+SVCT: SVCT.cpp
+	${CXX} ${CPPFLAGS} ${R_INC} ${CPPLIBS} -o SVCT.so SVCT.cpp
