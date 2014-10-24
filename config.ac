@@ -1,0 +1,13 @@
+
+AC_INIT([SVCT], 0.1.0)
+
+SVCT_CPP=/usr/local/bin/g++
+
+SVCT_LIBS=`R CMD config LDFLAGS`
+SVCT_R_INC=`R RHOME`
+
+AC_SUBST(SVCT_LIBS)
+AC_SUBST(SVCT_CPP)
+AC_SUBST(SVCT_R_INC)
+
+AC_OUTPUT(src/Makefile)
