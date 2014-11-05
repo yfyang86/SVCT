@@ -67,7 +67,7 @@ public:
 	int label=0;
 	
 	while(label==0){
-	r1=distribution(engines[id]);
+	r1=10.*distribution(engines[id])-20;
 	rej=distribution(engines[id]);
 	if (M*rej<normal(r1)){
 		label=1;
