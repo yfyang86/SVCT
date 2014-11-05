@@ -56,17 +56,23 @@ public:
         }
     }
     
-    inline double normal(double x, double miu,double sigma){
-    	return 1.0/sqrt(2*pi)/sigma*exp(-1*(x-miu)*(x-miu)/(2*sigma*sigma));
+    inline double normal(double x){
+    	return 1.0/sqrt(2*pi)*exp(-1*x*x/2);
     }
     
     double pnorm(int id){// Rejection Sampling
-	double r1,y,rej;
-	do{
+    //ROUTINE in R
+	double r1,rej;
+	double M=1./sqrt(2*pi);
+	int label=0;
+	
+	while(label==0){
 	r1=distribution(engines[id]);
-	y=normal(r1,0,1);
-	rej=distribution(engines[id])/sqrt(2*pi);
-	}while(rej>y);
+	rej=distribution(engines[id]);
+	if (M*rej<normal(r1)){
+		label=1;
+	}
+	};
 	return(r1);
     }
 
