@@ -25,7 +25,7 @@ struct SCORE{
 	
 	double val;
 	int id;
-	double pi;
+	
 	
 	bool operator < (const SCORE& sc) const{
 		return (val > sc.val);
@@ -41,6 +41,8 @@ struct SCORE{
 
 class RNG_st12918758
 {
+private:
+	double pi;
 public:
     typedef mt19937_64 Engine;
     typedef uniform_real_distribution<double> Distribution;
