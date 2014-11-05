@@ -39,7 +39,7 @@ struct SCORE{
 };
 
 
-class RNG_st1591875
+class RNG_st15918758
 {
 private:
 	double pi;
@@ -47,7 +47,7 @@ public:
     typedef mt19937_64 Engine;
     typedef uniform_real_distribution<double> Distribution;
 
-    RNG_st12918758(int seeding) : engines(), distribution(0.0, 1.0)
+    RNG_st15918758(int seeding) : engines(), distribution(0.0, 1.0)
     {   pi=3.1415926535897932384626433832795028841971693993751;//LIST
         int threads = max(1, omp_get_max_threads());
         for(int seed = 0; seed < threads; ++seed)
@@ -190,7 +190,7 @@ double *pval, int *obs_rank){
 	
   seed= seed >=0 ? seed : time(NULL);//seeding
 
-  RNG_st1591875 st_rnd(seed);
+  RNG_st15918758 st_rnd(seed);
 
 	#pragma omp parallel num_threads(nthread)
 	{
