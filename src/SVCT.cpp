@@ -61,7 +61,7 @@ public:
     }
     
     double pnorm(int id){// Rejection Sampling
-	double r1,w,rej;
+	double r1,y,rej;
 	do{
 	r1=distribution(engines[id]);
 	y=normal(r1,0,1);
