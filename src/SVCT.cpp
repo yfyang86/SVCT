@@ -48,7 +48,7 @@ public:
     typedef uniform_real_distribution<double> Distribution;
 
     RNG_st12918758(int seeding) : engines(), distribution(0.0, 1.0)
-    {   pi=3.1415926535897932384626433832795028841971693993751;
+    {   pi=3.1415926535897932384626433832795028841971693993751;//LIST
         int threads = max(1, omp_get_max_threads());
         for(int seed = 0; seed < threads; ++seed)
         {
@@ -56,17 +56,23 @@ public:
         }
     }
     
-    inline double normal(double x){
+    inline double normal(double x){// dnorm(x,0,1), no magic number
     	return 1.0/sqrt(2*pi)*exp(-1*x*x/2);
     }
     
-    double pnorm(int id){// Rejection Sampling
-    //ROUTINE in R
+    double pnorm(int id){
+    	// Rejection Sampling
+    	// ROUTINE 1: sample from f(x) with surport
+    	// N(-10),N(10) is accurate enough for MCMC
+    	//or Miller-Box Transformation.
+	// norm_distribution routine in c++11 is not Thread Safe!!!
+	// it may call Miller-Box method potentially uses other global RNG or /dev/random-dev
+	// or random dev on Windows uses global RNG or srand?
 	double r1,rej;
 	double M=1./sqrt(2*pi);
 	int label=0;
 	
-	while(label==0){
+	while(label==0){//TODO: ROUTINE 1
 	r1=20.*distribution(engines[id])-10;
 	rej=distribution(engines[id]);
 	if (M*rej<normal(r1)){
@@ -77,8 +83,7 @@ public:
     }
 
 
-    double operator()()
-    {
+    double operator()(){//TODO: return a normal 
         int id = omp_get_thread_num();
         return(pnorm(id));
     }
