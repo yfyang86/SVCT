@@ -37,11 +37,12 @@ struct SCORE{
 	
 };
 
+
 class RNG_st12918758
 {
 public:
-    typedef mt19937 Engine;
-    typedef normal_distribution<double> Distribution;
+    typedef mt19937_64 Engine;
+    typedef uniform_real_distribution<double> Distribution;
 
     RNG_st12918758(int seeding) : engines(), distribution(0.0, 1.0)
     {
@@ -51,11 +52,21 @@ public:
             engines.push_back(Engine(seeding+seed));//time(NULL)
         }
     }
+    
+    double pnorm(int id){
+	double r1,2;do{
+	r1=distribution(engines[id]);
+	r1 = 2.0 * r1 - 1.0;
+	w= r1*r1;}while(w>.5);
+	w = sqrt((-2.0 * log(w)) / w);
+	return(w);
+    }
+
 
     double operator()()
     {
         int id = omp_get_thread_num();
-        return distribution(engines[id]);
+        return(pnorm(id));
     }
 
     vector<Engine> engines;
