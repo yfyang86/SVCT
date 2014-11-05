@@ -1,4 +1,6 @@
-
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <R.h>
 #include <R_ext/Print.h>
 #include <stdlib.h>
@@ -19,29 +21,7 @@
 #include <omp.h>
 #include <random>
 
-#ifdef _WIN32
-#include <windows.h>
-typedef BOOL (WINAPI *LPFN_GLPI)(
-    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, 
-    PDWORD);
 
-DWORD CountSetBits(ULONG_PTR bitMask)
-{
-    DWORD LSHIFT = sizeof(ULONG_PTR)*8 - 1;
-    DWORD bitSetCount = 0;
-    ULONG_PTR bitTest = (ULONG_PTR)1 << LSHIFT;    
-    DWORD i;
-    
-    for (i = 0; i <= LSHIFT; ++i)
-    {
-        bitSetCount += ((bitMask & bitTest)?1:0);
-        bitTest/=2;
-    }
-
-    return bitSetCount;
-}
-
-#endif
 
 using namespace std;
 
@@ -161,40 +141,11 @@ double *pval, int *obs_rank){
 	int nthread = *input_nthread;
 #ifdef _WIN32
 //WIN works on Rtools GCC-4.6.3
-	//THREAD: from MSDN ms683194
-	LPFN_GLPI glpi;
-    BOOL done = FALSE;
-    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION buffer = NULL;
-    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION ptr = NULL;
-    DWORD returnLength = 0;
-    DWORD logicalProcessorCount = 0;
-    DWORD numaNodeCount = 0;//numaNodeCount
-    DWORD processorCoreCount = 0;
-    DWORD processorL1CacheCount = 0;
-    DWORD processorL2CacheCount = 0;
-    DWORD processorL3CacheCount = 0;
-    DWORD processorPackageCount = 0;
-    DWORD byteOffset = 0;
-    PCACHE_DESCRIPTOR Cache;
+	 SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
 
-    glpi = (LPFN_GLPI) GetProcAddress(
-                            GetModuleHandle(TEXT("kernel32")),
-                            "GetLogicalProcessorInformation");
-
-	ptr = buffer;
-	while (byteOffset + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) <= returnLength) {
-		switch (ptr->Relationship) {
-			case RelationProcessorCore:
-            processorCoreCount++;
-            // A hyperthreaded core supplies more than one logical processor.
-            logicalProcessorCount += CountSetBits(ptr->ProcessorMask);
-            break;
-
-			default:
-				break;
-		}
-	}
-	nthread = nthread>logicalProcessorCount ? logicalProcessorCount:nthread;
+	int logicalProcessorCount=sysinfo.dwNumberOfProcessors;//windows.h can't be used?
+	 nthread = nthread>logicalProcessorCount ? logicalProcessorCount:nthread;
 #else
 //Linux/Mac
 	if(nthread <= 0 || nthread > sysconf( _SC_NPROCESSORS_ONLN )){
