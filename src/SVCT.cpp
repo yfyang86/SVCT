@@ -54,7 +54,7 @@ public:
     }
     
     double pnorm(int id){
-	double r1,2;do{
+	double r1,w;do{
 	r1=distribution(engines[id]);
 	r1 = 2.0 * r1 - 1.0;
 	w= r1*r1;}while(w>.5);
