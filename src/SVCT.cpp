@@ -25,6 +25,7 @@ struct SCORE{
 	
 	double val;
 	int id;
+	double pi;
 	
 	bool operator < (const SCORE& sc) const{
 		return (val > sc.val);
@@ -45,7 +46,7 @@ public:
     typedef uniform_real_distribution<double> Distribution;
 
     RNG_st12918758(int seeding) : engines(), distribution(0.0, 1.0)
-    {
+    {   pi=3.1415926535897932384626433832795028841971693993751;
         int threads = max(1, omp_get_max_threads());
         for(int seed = 0; seed < threads; ++seed)
         {
@@ -53,13 +54,18 @@ public:
         }
     }
     
-    double pnorm(int id){
-	double r1,w;do{
+    inline double normal(double x, double miu,double sigma){
+    	return 1.0/sqrt(2*pi)/sigma*exp(-1*(x-miu)*(x-miu)/(2*sigma*sigma));
+    }
+    
+    double pnorm(int id){// Rejection Sampling
+	double r1,w,rej;
+	do{
 	r1=distribution(engines[id]);
-	r1 = 2.0 * r1 - 1.0;
-	w= r1*r1;}while(w>.5);
-	w = sqrt((-2.0 * log(w)) / w);
-	return(w);
+	y=normal(r1,0,1);
+	rej=distribution(engines[id])/sqrt(2*pi);
+	}while(rej>y);
+	return(r1);
     }
 
 
