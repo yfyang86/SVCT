@@ -39,7 +39,7 @@ struct SCORE{
 };
 
 
-class RNG_st12918758
+class RNG_st1591875
 {
 private:
 	double pi;
@@ -190,7 +190,7 @@ double *pval, int *obs_rank){
 	
   seed= seed >=0 ? seed : time(NULL);//seeding
 
-  RNG_st12918758 st_rnd(seed);
+  RNG_st1591875 st_rnd(seed);
 
 	#pragma omp parallel num_threads(nthread)
 	{
