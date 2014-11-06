@@ -57,7 +57,7 @@ class RNG_st15918758
 private:
 	double pi;
 public:
-    typedef mt19937_64 Engine;
+    typedef mt19937 Engine;
     typedef uniform_real_distribution<double> Distribution;
 
     RNG_st15918758(int seeding) : engines(), distribution(0.0, 1.0)
