@@ -1,5 +1,14 @@
 #ifdef _WIN32
 #include <windows.h>
+#else
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+#if  GCC_VERSION > 40600
+#include <random>
+#else
+#include <tr1/random>
+#endif
 #endif
 #include <R.h>
 #include <R_ext/Print.h>
@@ -19,7 +28,7 @@
 #include <float.h>
 #include <fcntl.h>
 #include <omp.h>
-#include <random>
+
 
 
 
