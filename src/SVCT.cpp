@@ -59,11 +59,7 @@ private:
 	double pi;
 public:
     typedef mt19937 Engine;
-#if GCC_VERSION > 40500
 typedef uniform_real_distribution<double> Distribution;
-#else
-typedef uniform_real<double> Distribution;
-#endif
     RNG_st15918758(int seeding) : engines(), distribution(0.0, 1.0)
     {   pi=3.1415926535897932384626433832795028841971693993751;//LIST
         int threads = max(1, omp_get_max_threads());
@@ -108,6 +104,7 @@ typedef uniform_real<double> Distribution;
     vector<Engine> engines;
     Distribution distribution;
 };
+
 
 /** NOT portable
 void rnorm(drand48_data &buf, int n, vector<double> &v1, vector<double> &v2){
