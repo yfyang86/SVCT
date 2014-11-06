@@ -7,8 +7,12 @@
 #if  GCC_VERSION > 40500
 #include <random>
 #else
+#ifndef __APPLE__
 #include <tr1/random>
 using namespace std::tr1;
+#else
+#include <random>
+#endif
 #endif
 #endif
 #include <R.h>
