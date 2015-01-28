@@ -58,7 +58,9 @@ struct SCORE{
 
 
 class RNG_st15918758
-{
+{// NOT THREAD-SAFE?
+// POSIX: rand_r: RAND_MAX	2147483647 ~ 2^31
+
 private:
 	double pi;
 public:
